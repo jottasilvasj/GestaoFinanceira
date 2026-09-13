@@ -1,23 +1,29 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using GestaoFinanceira.Models;
 using GestaoFinanceira.Interfaces;
-using System.Collections.Generic;
-using GestaoFinanceira.Exceptions;
 
 namespace GestaoFinanceira.Services
 {
     public class GerenciadorFinanceiro : IGerenciadorFinanceiro
     {
-        private readonly List<Transacao> _transacoes = new List<Transacao>();
+        private readonly List<Transacao> _transacoes;
 
-        // Método já existente (com implementação completa)
+        public GerenciadorFinanceiro()
+        {
+            _transacoes = new List<Transacao>();
+        }
+
+        public GerenciadorFinanceiro(List<Transacao> transacoesIniciais)
+        {
+            _transacoes = transacoesIniciais ?? new List<Transacao>();
+        }
+
         public void AdicionarTransacao(Transacao transacao)
         {
             if (transacao == null)
-            {
                 throw new ArgumentNullException(nameof(transacao), "A transação é inválida.");
-            }
 
             decimal impacto = transacao.CalcularImpactoSaldo();
 
@@ -25,15 +31,13 @@ namespace GestaoFinanceira.Services
             {
                 decimal saldoAtual = ObterSaldoTotal();
                 if (saldoAtual + impacto < 0)
-                {
-                    throw new InvalidOperationException("Saldo insuficiente para realizar a transação.");
-                }
+                    throw new InvalidOperationException(
+                        $"Saldo insuficiente! Saldo atual: R$ {saldoAtual:F2}, valor da transação: R$ {transacao.Valor:F2}.");
             }
 
             _transacoes.Add(transacao);
         }
 
-        // Implementação exigida pela interface; delega para AdicionarTransacao
         public void AdicionarReceita(Transacao transacao)
         {
             AdicionarTransacao(transacao);
@@ -46,26 +50,30 @@ namespace GestaoFinanceira.Services
 
         public List<Transacao> ListarTodas()
         {
-            return new List<Transacao>(_transacoes);
+            return _transacoes
+                .OrderByDescending(t => t.Data)
+                .ToList();
         }
 
         public List<Transacao> FiltrarPorCategoria(CategoriaEnum categoria)
         {
-            return _transacoes.Where(t => t.categoria == categoria).ToList();
+            return _transacoes
+                .Where(t => t.Categoria == categoria)
+                .OrderByDescending(t => t.Data)
+                .ToList();
         }
 
         public List<Transacao> BuscarPorPeriodo(DateTime dataInicio, DateTime dataFim)
         {
             if (dataInicio > dataFim)
-            {
-                throw new ArgumentException(nameof(dataInicio), "dataInicio deve ser menor ou igual a dataFim.");
-            }
+                throw new ArgumentException("dataInicio deve ser menor ou igual a dataFim.", nameof(dataInicio));
 
             DateTime inicio = dataInicio.Date;
             DateTime fim = dataFim.Date;
 
             return _transacoes
                 .Where(t => t.Data.Date >= inicio && t.Data.Date <= fim)
+                .OrderByDescending(t => t.Data)
                 .ToList();
         }
     }
