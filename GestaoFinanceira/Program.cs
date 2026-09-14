@@ -15,7 +15,6 @@ namespace GestaoFinanceira
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-            // Carrega dados salvos anteriormente (se existirem)
             CarregarDadosSalvos();
 
             bool continuar = true;
