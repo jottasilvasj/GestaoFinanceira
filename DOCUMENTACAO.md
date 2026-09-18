@@ -2,128 +2,113 @@
 
 ## Visão geral
 
-O projeto Gestão Financeira é uma aplicação para controle básico de finanças pessoais, com foco em receitas, despesas, saldo total, filtros por categoria e busca por período. O repositório contém duas formas de execução:
-
-- `GestaoFinanceira`: aplicação de console em C# para uso local e didático
-- `GestaoFinanceira.Api`: API REST em ASP.NET Core para acesso via web ou integrações
-- `frontend`: interface web em HTML, CSS e JavaScript para uso em navegador
-
-O objetivo principal é demonstrar organização por camadas, manipulação de transações financeiras e persistência em arquivo local.
+O projeto Gestão Financeira é uma aplicação para gerenciamento de finanças pessoais com suporte a receitas, despesas, cálculo de saldo e organização por categoria e período. Ao longo do desenvolvimento, o projeto evoluiu para incluir também uma API REST e uma interface web, tornando a aplicação mais moderna e fácil de usar.
 
 ## Estrutura do repositório
 
 ```text
 GestaoFinanceira/
-├── GestaoFinanceira/          # Projeto principal em console/C#
+├── GestaoFinanceira/              # Aplicação principal em C#
 │   ├── Exceptions/
 │   ├── Interfaces/
 │   ├── Models/
 │   ├── Services/
 │   ├── Program.cs
 │   └── GestaoFinanceira.csproj
-├── GestaoFinanceira.Api/      # API REST ASP.NET Core
+├── GestaoFinanceira.Api/          # API REST em ASP.NET Core
 │   ├── Dtos/
 │   ├── Properties/
 │   ├── Program.cs
 │   ├── appsettings.json
 │   ├── appsettings.Development.json
 │   └── GestaoFinanceira.Api.csproj
-├── frontend/                  # Front-end web
+├── frontend/                      # Aplicação web
 │   ├── index.html
 │   ├── style.css
-│   ├── app.js
-├── README.md                  # Documentação inicial do projeto
-├── GestaoFinanceira.slnx      # Solução do projeto
-└── .gitignore
+│   └── app.js
+├── README.md
+├── DOCUMENTACAO.md
+├── GestaoFinanceira.slnx
+├── .gitignore
+└── transacoes.json
 ```
 
-## Arquitetura e componentes
+## Funcionalidades atuais
 
-### 1. Camada de domínio
-
-Localizada em `GestaoFinanceira` e responsável pela regra de negócio principal.
-
-Principais responsabilidades:
-
-- cadastro de receitas e despesas
+### Aplicação em console
+- cadastro de receitas
+- cadastro de despesas
 - cálculo do saldo total
 - listagem de transações
 - filtros por categoria
-- buscas por período
-- persistência de dados em arquivo JSON
+- busca por período
+- persistência dos dados em arquivo JSON
 
-### 2. API REST
+### API REST
+- listagem de transações
+- consulta de saldo
+- filtro por categoria
+- busca por período
+- cadastro de transações
+- validação de entrada
+- documentação com Swagger
 
-Localizada em `GestaoFinanceira.Api`, a API expõe endpoints para consulta e inserção de transações.
+### Front-end web
+- visualização do saldo
+- listagem das transações em tabela
+- filtro por categoria
+- cadastro de receitas e despesas diretamente pela página
+- atualização automática da tela após inclusão
 
-Funcionalidades disponíveis:
+### Regras de negócio
+- despesas não podem deixar o saldo final negativo
+- o sistema valida valores e datas antes de registrar a transação
+- transações são armazenadas em memória e também em arquivo para persistência local
 
-- listar todas as transações
-- consultar saldo
-- buscar transações por categoria
-- buscar transações por período
-- criar nova transação
-- documentação automática via Swagger
+## Arquitetura
 
-### 3. Front-end
+O projeto foi organizado em camadas para facilitar manutenção e evolução:
 
-Localizada em `frontend`, a interface web utiliza HTML, CSS e JavaScript para consumir a API REST do backend.
+- `GestaoFinanceira`: lógica principal do sistema
+- `GestaoFinanceira.Api`: camada de acesso e exposição de serviços
+- `frontend`: interface visual para interação com o usuário
+- `Models`: entidades e enumerações
+- `Services`: regras de negócio e persistência
+- `Interfaces`: contratos para abstração das dependências
 
-## Requisitos do sistema
+## Requisitos
 
-Antes de executar o projeto, verifique se os itens abaixo estão instalados:
-
-- .NET SDK (compatível com o projeto)
+- .NET SDK
 - Git
-- Editor de código: VS Code, Visual Studio ou qualquer IDE compatível com .NET
-- Navegador para acessar a interface web
+- Visual Studio Code ou Visual Studio
+- Navegador (para o frontend)
 
-## Como executar a aplicação em console
-
-Na raiz do repositório:
+## Como executar a aplicação de console
 
 ```bash
-dotnet restore
 cd GestaoFinanceira
-
 dotnet run
 ```
 
-Ou diretamente no projeto:
+Ou:
 
 ```bash
 dotnet run --project ./GestaoFinanceira/GestaoFinanceira.csproj
 ```
 
-### Menu disponível
-
-A aplicação apresenta um menu com as seguintes opções:
-
-1. Adicionar receita
-2. Adicionar despesa
-3. Exibir saldo total
-4. Listar transações
-5. Filtrar por categoria
-6. Buscar por período
-7. Salvar dados
-0. Sair
-
 ## Como executar a API
-
-A partir da raiz do projeto:
 
 ```bash
 dotnet run --project ./GestaoFinanceira.Api/GestaoFinanceira.Api.csproj
 ```
 
-A API será iniciada localmente e pode ser acessada em:
+A API local normalmente fica em:
 
 ```text
 https://localhost:5001
-http://localhost:5000
 ```
 
-A documentação Swagger fica disponível em:
+A documentação Swagger pode ser acessada em:
 
 ```text
 https://localhost:5001/swagger
@@ -131,43 +116,22 @@ https://localhost:5001/swagger
 
 ## Endpoints da API
 
-### Listar todas as transações
+### GET /api/transacoes/
+Lista todas as transações.
 
-```http
-GET /api/transacoes/
-```
+### GET /api/transacoes/saldo
+Retorna o saldo total atual.
 
-### Obter saldo total
+### GET /api/transacoes/categoria/{categoria}
+Retorna transações filtradas por categoria.
 
-```http
-GET /api/transacoes/saldo
-```
+### GET /api/transacoes/periodo?inicio=yyyy-MM-dd&fim=yyyy-MM-dd
+Retorna transações em um período específico.
 
-### Filtrar por categoria
+### POST /api/transacoes/
+Cria uma nova transação.
 
-```http
-GET /api/transacoes/categoria/{categoria}
-```
-
-Exemplo:
-
-```http
-GET /api/transacoes/categoria/Alimentacao
-```
-
-### Buscar por período
-
-```http
-GET /api/transacoes/periodo?inicio=2024-01-01&fim=2024-12-31
-```
-
-### Criar transação
-
-```http
-POST /api/transacoes/
-```
-
-Payload esperado:
+Exemplo de payload:
 
 ```json
 {
@@ -179,18 +143,14 @@ Payload esperado:
 }
 ```
 
-> Os nomes dos campos e valores devem seguir o modelo da aplicação, especialmente o `TipoTransacao` e o `CategoriaEnum` definidos no projeto.
-
 ## Como executar o front-end
-
-Abra o arquivo `frontend/index.html` em um navegador, ou utilize um servidor local simples, por exemplo:
 
 ```bash
 cd frontend
 python -m http.server 8000
 ```
 
-Depois acesse:
+Acesse:
 
 ```text
 http://localhost:8000
@@ -198,59 +158,29 @@ http://localhost:8000
 
 ## Persistência de dados
 
-A aplicação de console salva e carrega transações em um arquivo local chamado:
+Os dados são salvos em `transacoes.json` no diretório de execução da aplicação. Esse arquivo permite que informações sejam carregadas novamente ao iniciar o sistema.
 
-```text
-transacoes.json
-```
+## Novas funcionalidades implementadas
 
-Esse arquivo é gerado no diretório de execução do projeto. Em ambiente local, normalmente ele fica na pasta do projeto `GestaoFinanceira`.
+As principais melhorias recentes foram:
 
-## Boas práticas observadas no projeto
+1. Conversão do sistema para arquitetura com API REST
+2. Integração do backend com um frontend web
+3. Validação de saldo insuficiente para impedir despesas inconsistentes
+4. Suporte à consulta por categoria e período via endpoints
+5. Documentação interativa com Swagger
+6. Melhor experiência de uso para quem não trabalha diretamente no console
 
-- separação de responsabilidades por camadas
-- uso de interfaces para abstração de serviços
-- uso de modelos para representar transações
-- uso de serviços para regras de negócio e persistência
-- API com documentação automática via Swagger
-- arquitetura simples e didática para estudo e evolução
-
-## Fluxo de uso típico
-
-1. Usuário cadastra receitas e despesas.
-2. O sistema calcula o saldo total.
-3. As transações são armazenadas em arquivo JSON.
-4. A API expõe dados para consulta e integração.
-5. O front-end exibe os dados em uma interface amigável.
-
-## Possíveis melhorias futuras
+## Melhorias futuras sugeridas
 
 - autenticação e autorização
-- banco de dados persistente (SQL Server, PostgreSQL, SQLite)
-- exportação para CSV/PDF
-- relatórios mensais e gráficos
-- testes automatizados (unitários e de integração)
-- melhorias na validação de entrada
+- banco de dados persistente
+- relatórios mensais
+- gráficos e dashboards financeiros
+- exportação em PDF/CSV
+- testes automatizados
 - paginação e filtros avançados
 
-## Contribuição
+## Conclusão
 
-Para colaborar com o projeto:
-
-1. faça um fork do repositório
-2. crie uma branch com nome descritivo
-3. implemente a mudança
-4. abra um pull request com descrição clara
-
-## Observação final
-
-Este projeto é bem adequado para fins de estudo, demonstração de boas práticas de desenvolvimento em C# e construções de API REST com ASP.NET Core. Ele pode evoluir para um sistema financeiro mais completo sem perder a simplicidade inicial.
-
----
-
-Se quiser, posso também criar uma versão mais "profissional" da documentação em inglês, ou preparar uma documentação específica para:
-
-- README principal do GitHub
-- documentação técnica para desenvolvedores
-- documentação para usuários finais
-- documentação de API com exemplos completos
+O projeto evoluiu de uma aplicação de console para uma solução mais completa, com suporte a API e interface web. Isso amplia bastante sua utilidade, mantendo a simplicidade e a didática do desenvolvimento em C#.
