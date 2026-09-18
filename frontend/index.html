@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão Financeira</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestão Financeira</h1>
+            <div class="saldo-card">
+                <span>Saldo atual</span>
+                <strong id="saldo">R$ 0,00</strong>
+            </div>
+        </header>
+
+        <section class="form-card">
+            <h2>Nova transação</h2>
+            <form id="form-transacao">
+                <div class="campo">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo" required>
+                        <option value="Receita">Receita</option>
+                        <option value="Despesa">Despesa</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="descricao">Descrição</label>
+                    <input type="text" id="descricao" required>
+                </div>
+
+                <div class="campo">
+                    <label for="valor">Valor (R$)</label>
+                    <input type="number" id="valor" step="0.01" min="0.01" required>
+                </div>
+
+                <div class="campo">
+                    <label for="data">Data</label>
+                    <input type="date" id="data" required>
+                </div>
+
+                <div class="campo">
+                    <label for="categoria">Categoria</label>
+                    <select id="categoria" required>
+                        <option value="Salario">Salário</option>
+                        <option value="Alimentacao">Alimentação</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Moradia">Moradia</option>
+                        <option value="Lazer">Lazer</option>
+                        <option value="Investimentos">Investimentos</option>
+                    </select>
+                </div>
+
+                <button type="submit">Adicionar</button>
+            </form>
+            <p id="mensagem-erro" class="erro"></p>
+        </section>
+
+        <section class="lista-card">
+            <div class="lista-header">
+                <h2>Transações</h2>
+                <select id="filtro-categoria">
+                    <option value="">Todas as categorias</option>
+                    <option value="Salario">Salário</option>
+                    <option value="Alimentacao">Alimentação</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Moradia">Moradia</option>
+                    <option value="Lazer">Lazer</option>
+                    <option value="Investimentos">Investimentos</option>
+                </select>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Categoria</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-transacoes"></tbody>
+            </table>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
